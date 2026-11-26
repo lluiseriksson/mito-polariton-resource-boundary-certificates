@@ -5,6 +5,10 @@
   "payload": {
     "submode": "passive_crista_network_mixing",
     "network_order_S": 9,
+    "crista_spacing_nm": [
+      25,
+      1
+    ],
     "singular_value_const_CS": [
       25,
       1

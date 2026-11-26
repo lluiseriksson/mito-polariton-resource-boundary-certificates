@@ -392,38 +392,70 @@ def _verify_mode3(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Mode 4: dark_mode_filling_and_passive_network (ARR-2026-6YFENMGGBY9PPBF1 & ARR-2026-4F7SF8FXM18ANAXH)
+# Mode 4: bosonic_dark_mode_and_passive_crista_network
 # ---------------------------------------------------------------------------
+
+def _exp_lower_bound_rational(x: Fraction, terms: int = 24) -> Fraction:
+    """Exact rational lower bound for exp(x) - 1 (x > 0) via truncated positive Taylor series."""
+    if x <= 0:
+        raise VerificationError("x must be strictly positive for exp lower bound")
+    s = Fraction(0, 1)
+    term = Fraction(1, 1)
+    for k in range(1, terms + 1):
+        term = term * x * Fraction(1, k)
+        s += term
+    return s
+
 
 def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
     submode = _req_str(payload.get("submode"), "submode")
 
-    if submode == "filled_manybody_dark_mode_floor":
+    if submode == "bosonic_hopfield_dark_mode_leakage":
+        # Exact first-principles bosonic Hopfield-Dicke dark-mode dephasing transfer:
+        # N identical bosonic CH_2 stretches coupled to 1 cavity mode at resonance (nu_p * nu_m = w0^2):
+        #   - 1 bright symmetric Dicke mode + (N - 1) orthogonal dark modes
+        #   - Lower-polariton Hopfield matter weight w_mat = nu_m^2 / (w0^2 + nu_m^2) < 1/2
+        #   - Photonic weight w_phot = w0^2 / (w0^2 + nu_m^2) > 1/2
+        #   - Local Markovian dephasing transfer into (N-1) dark modes:
+        #       Gamma_{MP- -> D} / gamma_loc = w_mat * (N - 1) / N  (NO 1/N collective protection!)
+        #   - Exact Bose-Einstein thermal occupation upper bound n_th = 1 / (exp(h*w0 / kBT) - 1)
         N_dipoles = _req_int(payload.get("num_ch2_dipoles"), "num_ch2_dipoles", 2, 10**12)
-        w_vals_raw = _req_list(payload.get("zero_mode_weights"), "zero_mode_weights", 1, 64)
-        results = []
-        for idx, wr in enumerate(w_vals_raw):
-            w = _parse_rat(wr, f"zero_mode_weights[{idx}]")
-            if w < 0 or w > 1:
-                raise VerificationError(f"Weight w={w} out of [0, 1]")
-            dilute = w * (1 - w)
-            filled = (1 + 2 * w - 3 * w * w) * Fraction(1, 4)
-            excess = filled - dilute
-            if excess != ((1 - w) ** 2) * Fraction(1, 4):
-                raise VerificationError("Exact filled-vs-dilute leakage identity failed")
-            if w <= Fraction(2, 3) and filled < Fraction(1, 4):
-                raise VerificationError("Filled leakage fell below 1/4 floor for w <= 2/3")
-            results.append({
-                "w": _rat_pair(w),
-                "dilute_leak": _rat_pair(dilute),
-                "filled_leak": _rat_pair(filled),
-                "floor_excess": _rat_pair(excess),
-            })
+        w0 = _parse_rat(payload.get("omega_0_thz"), "omega_0_thz")
+        nu_m = _parse_rat(payload.get("nu_minus_thz"), "nu_minus_thz")
+        T_K = _parse_rat(payload.get("temperature_K"), "temperature_K")
+        nth_upper_claim = _parse_rat(payload.get("thermal_occ_upper_bound"), "thermal_occ_upper_bound")
+        if w0 <= 0 or nu_m <= 0 or nu_m >= w0 or T_K <= 0 or nth_upper_claim <= 0:
+            raise VerificationError("Invalid bosonic Hopfield dark-mode parameters")
+
+        w0_sq = w0 * w0
+        num_sq = nu_m * nu_m
+        denom = w0_sq + num_sq
+        w_mat = num_sq * _inv(denom)
+        w_phot = w0_sq * _inv(denom)
+        if w_mat + w_phot != 1 or not (w_mat < Fraction(1, 2) < w_phot):
+            raise VerificationError("Exact Hopfield matter/photonic weight invariant failed")
 
         bright_frac = Fraction(1, N_dipoles)
         dark_frac = Fraction(N_dipoles - 1, N_dipoles)
         if bright_frac + dark_frac != 1:
             raise VerificationError("Bright/dark partition mismatch")
+
+        # Exact polariton-to-dark local-dephasing transfer factor w_mat * (N - 1) / N
+        dark_transfer_factor = w_mat * dark_frac
+        if dark_transfer_factor < Fraction(1, 2) * w_mat:
+            raise VerificationError("Bosonic dark-mode transfer fell below (1/2)*w_mat for N >= 2")
+
+        # Exact SI-2019 dimensionless thermal ratio x = h * w0 / (k_B * T)
+        # h / k_B = (662607015 / 10^42) / (1380649 / 10^29) s*K = 662607015 / (1380649 * 10^13) s*K
+        # For w0 in THz (= 10^12 Hz): h * w0 / k_B in K = w0 * (662607015 / (1380649 * 10))
+        h_over_kb_K_per_THz = Fraction(662607015, 13806490)
+        x_th = w0 * h_over_kb_K_per_THz * _inv(T_K)
+        exp_m1_lb = _exp_lower_bound_rational(x_th, terms=30)
+        nth_exact_ub = _inv(exp_m1_lb)
+        if nth_exact_ub > nth_upper_claim:
+            raise VerificationError(
+                f"Thermal occupation bound {nth_exact_ub} exceeds claimed upper bound {nth_upper_claim}"
+            )
 
         return {
             "mode": "dark_mode_filling_and_passive_network",
@@ -432,15 +464,26 @@ def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
             "num_dark_modes": N_dipoles - 1,
             "bright_fraction": _rat_pair(bright_frac),
             "dark_fraction": _rat_pair(dark_frac),
-            "num_weights_audited": len(results),
-            "min_filled_leak": _rat_pair(min(Fraction(*r["filled_leak"]) for r in results)),
-            "max_dilute_to_filled_gap": _rat_pair(max(Fraction(*r["floor_excess"]) for r in results)),
+            "hopfield_matter_weight": _rat_pair(w_mat),
+            "hopfield_photonic_weight": _rat_pair(w_phot),
+            "dark_dephasing_transfer_factor": _rat_pair(dark_transfer_factor),
+            "thermal_ratio_hw0_over_kBT": _rat_pair(x_th),
+            "thermal_occ_certified_ub": _rat_pair(nth_exact_ub),
         }
 
     if submode == "passive_crista_network_mixing":
-        # Audit ARR-2026-4F7SF8FXM18ANAXH finite-error obstruction:
-        # comparator stopband leakage >= [1 - C_S * (delta + beta)]_+
+        # Audit ARR-2026-4F7SF8FXM18ANAXH finite-error obstruction explicitly mapped to
+        # an S-lamella mitochondrial cristae stack:
+        #   - S = coupled lamellar cristae cavities (spacing 20-40 nm)
+        #   - delta = passband calibration tolerance across 60-80 THz quiet window
+        #   - beta = inter-crista junction loss defect per port
+        #   - C_S = singular-value constant across 3*(S-1) single-port tangential calibrations
+        #   - irred_leak = coupled-stack stopband transmittance across 90-110 THz water/amide band
+        #   - Comparator stopband leakage >= [1 - C_S * (delta + beta)]_+
         S_order = _req_int(payload.get("network_order_S"), "network_order_S", 5, 100)
+        spacing_nm = _parse_rat(payload.get("crista_spacing_nm"), "crista_spacing_nm")
+        if spacing_nm <= 0 or spacing_nm > 200:
+            raise VerificationError("crista_spacing_nm must lie in (0, 200] nm")
         C_S = _parse_rat(payload.get("singular_value_const_CS"), "singular_value_const_CS")
         delta = _parse_rat(payload.get("calibration_defect_delta"), "calibration_defect_delta")
         beta = _parse_rat(payload.get("reducing_line_defect_beta"), "reducing_line_defect_beta")
@@ -460,6 +503,7 @@ def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
             "mode": "dark_mode_filling_and_passive_network",
             "submode": submode,
             "network_order_S": S_order,
+            "crista_spacing_nm": _rat_pair(spacing_nm),
             "tangential_calibrations": num_calibrations,
             "reducible_leakage_lower_bound": _rat_pair(red_lower_bound),
             "irreducible_stopband_leak": _rat_pair(irred_leak),

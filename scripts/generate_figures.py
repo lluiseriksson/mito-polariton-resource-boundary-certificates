@@ -151,27 +151,42 @@ def fig2_bioenergetic_resource_horizon() -> None:
 
 
 def fig3_dark_mode_filling_and_network() -> None:
-    """Figure 3: (a) Exact Filled vs Dilute leakage sum rule (ARR-2026-6YFENMGGBY9PPBF1); (b) Passive multi-crista network advantage."""
-    r13 = verify_file(CERTS_DIR / "C13_filled_dark_mode_floor_10e6_lipids.json")
+    """Figure 3: (a) Exact bosonic Hopfield-Dicke dark-mode dephasing transfer vs eta; (b) Multi-crista passive network separation."""
+    r13 = verify_file(CERTS_DIR / "C13_bosonic_dark_mode_leakage_71thz_10e6.json")
+    r14 = verify_file(CERTS_DIR / "C14_bosonic_dark_mode_leakage_79thz_10e8.json")
     r15 = verify_file(CERTS_DIR / "C15_passive_network_S5_irreducible_gap.json")
     r16 = verify_file(CERTS_DIR / "C16_passive_network_S9_multi_crista_stack.json")
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.6, 3.55))
 
-    ws = [i / 200.0 for i in range(201)]
-    dilute = [w * (1.0 - w) for w in ws]
-    filled = [(1.0 + 2.0 * w - 3.0 * w * w) / 4.0 for w in ws]
-    ax1.plot(ws, filled, color="#d73027", lw=2.2, label=r"Filled many-body $W_{\mathrm{leak}}^{\mathrm{filled}}(w) = \frac{1+2w-3w^2}{4}$")
-    ax1.plot(ws, dilute, color="#2166ac", lw=1.8, ls="--", label=r"Dilute leakage $w(1 - w) \to 0$")
-    ax1.fill_between(ws, dilute, filled, color="#fdae61", alpha=0.35, label=r"Irreducible gap $(1 - w)^2 / 4$")
-    ax1.axhline(0.25, color="#555555", lw=1.1, ls=":", label=r"Asymptotic floor $1/4$ ($w \to 0$, C13)")
-    ax1.scatter([0.0, 1.0 / 3.0, 2.0 / 3.0], [0.25, 1.0 / 3.0, 0.25], color="#b2182b", s=42, zorder=5)
-    ax1.set_xlim(0.0, 1.0)
-    ax1.set_ylim(0.0, 0.50)
-    ax1.set_xlabel(r"Boundary zero-mode weight $w$")
-    ax1.set_ylabel("Exact summed leakage weight")
-    ax1.set_title("(a) Many-Body Filling Floor (ARR-2026-6YFENMGGBY9PPBF1)")
-    ax1.legend(loc="upper right", frameon=True, framealpha=0.92, fontsize=6.9)
+    etas = [0.001 + 0.349 * i / 200.0 for i in range(201)]
+    # Exact resonant Hopfield lower branch: nu_- / w0 = sqrt(1 + eta^2) - eta
+    # Matter weight w_mat = nu_-^2 / (w0^2 + nu_-^2) = 1 / (1 + (sqrt(1+eta^2)+eta)^2)
+    w_mat = []
+    w_phot = []
+    for e in etas:
+        r_m = (1.0 + e * e) ** 0.5 - e
+        wm = (r_m * r_m) / (1.0 + r_m * r_m)
+        w_mat.append(wm)
+        w_phot.append(1.0 - wm)
+    ax1.plot(etas, w_mat, color="#d73027", lw=2.2, label=r"Bosonic dark-mode transfer $\Gamma_{\mathrm{MP}^-\!\to\mathcal{D}}/\gamma_{\mathrm{loc}} = w_{\mathrm{mat}}\frac{N-1}{N}$")
+    ax1.plot(etas, w_phot, color="#2166ac", lw=1.8, ls="--", label=r"Photonic weight $w_{\mathrm{phot}} = \frac{\omega_0^2}{\omega_0^2+\nu_-^2}$ ($A^2$ shift)")
+    ax1.axhline(0.5, color="#555555", lw=1.1, ls=":", label=r"RWA symmetric limit ($w_{\mathrm{mat}} = w_{\mathrm{phot}} = 1/2$)")
+    eta_c13 = 1264.0 / 6177.0
+    eta_c14 = (7569.0 / 79.0 - 79.0) / (2.0 * 87.0)
+    t_c13 = _f(r13["dark_dephasing_transfer_factor"])
+    t_c14 = _f(r14["dark_dephasing_transfer_factor"])
+    ax1.scatter([eta_c13, eta_c14], [t_c13, t_c14], color="#b2182b", edgecolor="black", s=48, zorder=6)
+    ax1.annotate("C13 (71 THz,\n$w_{\\mathrm{mat}}=0.400$)", xy=(eta_c13, t_c13), xytext=(eta_c13 - 0.02, 0.25),
+                 arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7.5)
+    ax1.annotate("C14 (79 THz,\n$w_{\\mathrm{mat}}=0.452$)", xy=(eta_c14, t_c14), xytext=(0.015, 0.30),
+                 arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7.5)
+    ax1.set_xlim(0.0, 0.35)
+    ax1.set_ylim(0.20, 0.78)
+    ax1.set_xlabel(r"Normalized coupling $\eta = g / \omega_0$")
+    ax1.set_ylabel("Exact Hopfield weight / transfer factor")
+    ax1.set_title(r"(a) Bosonic Dark-Mode Dephasing Transfer ($N\geq 10^6$)")
+    ax1.legend(loc="upper left", frameon=True, framealpha=0.92, fontsize=6.6)
     ax1.grid(alpha=0.22)
 
     # Panel (b): Live Mode 4b passive network reducible floor vs irreducible multi-crista stopband leak
@@ -190,8 +205,8 @@ def fig3_dark_mode_filling_and_network() -> None:
         ax2.text(bar.get_x() + bar.get_width() / 2.0, v * 1.25, f"{v:.3f}", ha="center", va="bottom", fontsize=7.8)
     ax2.set_xticks(range(len(cats)))
     ax2.set_xticklabels(cats, fontsize=7.8)
-    ax2.set_ylabel("Stopband leakage norm (log scale)")
-    ax2.set_title("(b) Passive Network Channel-Mixing Separation")
+    ax2.set_ylabel("90–110 THz water-band transmittance (log)")
+    ax2.set_title("(b) Multi-Crista Stack Channel-Mixing Separation")
     ax2.grid(axis="y", which="both", alpha=0.22)
 
     assert r13["num_dark_modes"] == 999999

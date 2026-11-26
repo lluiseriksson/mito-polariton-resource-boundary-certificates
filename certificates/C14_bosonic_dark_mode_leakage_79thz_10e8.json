@@ -1,0 +1,25 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C14",
+  "mode": "dark_mode_filling_and_passive_network",
+  "payload": {
+    "submode": "bosonic_hopfield_dark_mode_leakage",
+    "num_ch2_dipoles": 100000000,
+    "omega_0_thz": [
+      87,
+      1
+    ],
+    "nu_minus_thz": [
+      79,
+      1
+    ],
+    "temperature_K": [
+      310,
+      1
+    ],
+    "thermal_occ_upper_bound": [
+      1,
+      500000
+    ]
+  }
+}

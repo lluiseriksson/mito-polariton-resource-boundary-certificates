@@ -233,30 +233,36 @@ def main() -> int:
                 },
             },
         ),
-        # Mode 4: Collective Dark-Mode Filling Floor & Passive Multi-Crista Network (C13-C16)
+        # Mode 4: Bosonic Hopfield-Dicke Dark-Mode Leakage & Passive Multi-Crista Stack (C13-C16)
         (
-            "C13_filled_dark_mode_floor_10e6_lipids.json",
+            "C13_bosonic_dark_mode_leakage_71thz_10e6.json",
             {
                 "schema_version": SCHEMA_VERSION,
                 "cert_id": "C13",
                 "mode": "dark_mode_filling_and_passive_network",
                 "payload": {
-                    "submode": "filled_manybody_dark_mode_floor",
+                    "submode": "bosonic_hopfield_dark_mode_leakage",
                     "num_ch2_dipoles": 1000000,
-                    "zero_mode_weights": [[0, 1], [1, 1000], [1, 100], [1, 10], [1, 3], [2, 3]],
+                    "omega_0_thz": [87, 1],
+                    "nu_minus_thz": [71, 1],
+                    "temperature_K": [310, 1],
+                    "thermal_occ_upper_bound": [1, 500000],
                 },
             },
         ),
         (
-            "C14_filled_dark_mode_floor_crista_domain.json",
+            "C14_bosonic_dark_mode_leakage_79thz_10e8.json",
             {
                 "schema_version": SCHEMA_VERSION,
                 "cert_id": "C14",
                 "mode": "dark_mode_filling_and_passive_network",
                 "payload": {
-                    "submode": "filled_manybody_dark_mode_floor",
+                    "submode": "bosonic_hopfield_dark_mode_leakage",
                     "num_ch2_dipoles": 100000000,
-                    "zero_mode_weights": [[1, 10000], [1, 256], [1, 16], [1, 4], [1, 2], [1, 1]],
+                    "omega_0_thz": [87, 1],
+                    "nu_minus_thz": [79, 1],
+                    "temperature_K": [310, 1],
+                    "thermal_occ_upper_bound": [1, 500000],
                 },
             },
         ),
@@ -269,6 +275,7 @@ def main() -> int:
                 "payload": {
                     "submode": "passive_crista_network_mixing",
                     "network_order_S": 5,
+                    "crista_spacing_nm": [30, 1],
                     "singular_value_const_CS": [12, 1],
                     "calibration_defect_delta": [1, 100],
                     "reducing_line_defect_beta": [1, 100],
@@ -285,6 +292,7 @@ def main() -> int:
                 "payload": {
                     "submode": "passive_crista_network_mixing",
                     "network_order_S": 9,
+                    "crista_spacing_nm": [25, 1],
                     "singular_value_const_CS": [25, 1],
                     "calibration_defect_delta": [1, 200],
                     "reducing_line_defect_beta": [1, 200],

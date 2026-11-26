@@ -73,8 +73,10 @@ def test_key_exact_physics_and_horizon_metrics() -> None:
     r11 = V.verify_file(CERTS_DIR / "C11_cristae_collar_rip_u_with_floor.json")
     assert r11["lorentzian_suppression_factor"] == [5, 1]
 
-    r13 = V.verify_file(CERTS_DIR / "C13_filled_dark_mode_floor_10e6_lipids.json")
-    assert Fraction(*r13["min_filled_leak"]) == Fraction(1, 4)
+    r13 = V.verify_file(CERTS_DIR / "C13_bosonic_dark_mode_leakage_71thz_10e6.json")
+    assert Fraction(*r13["hopfield_matter_weight"]) == Fraction(5041, 12610)
+    assert Fraction(*r13["hopfield_photonic_weight"]) == Fraction(7569, 12610)
+    assert Fraction(*r13["thermal_occ_certified_ub"]) < Fraction(2, 1000000)
 
 
 # Adversarial forgery tests
@@ -143,6 +145,13 @@ def test_reject_non_increasing_collar_steps() -> None:
     c = _load("C11_cristae_collar_rip_u_with_floor.json")
     c["payload"]["collar_steps"] = [2, 2, 4]
     with pytest.raises(V.VerificationError, match="strictly increasing"):
+        V.verify_certificate(c)
+
+
+def test_reject_false_thermal_occupation_bound() -> None:
+    c = _load("C13_bosonic_dark_mode_leakage_71thz_10e6.json")
+    c["payload"]["thermal_occ_upper_bound"] = [1, 10000000]  # 1e-7 < true ~1.41e-6!
+    with pytest.raises(V.VerificationError, match="Thermal occupation bound"):
         V.verify_certificate(c)
 
 
