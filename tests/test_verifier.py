@@ -74,9 +74,9 @@ def test_key_exact_physics_and_horizon_metrics() -> None:
     assert r11["lorentzian_suppression_factor"] == [5, 1]
 
     r13 = V.verify_file(CERTS_DIR / "C13_bosonic_dark_mode_leakage_71thz_10e6.json")
-    assert Fraction(*r13["hopfield_matter_weight"]) == Fraction(5041, 12610)
-    assert Fraction(*r13["hopfield_photonic_weight"]) == Fraction(7569, 12610)
-    assert Fraction(*r13["thermal_occ_certified_ub"]) < Fraction(2, 1000000)
+    assert Fraction(*r13["hopfield_matter_weight"]) == Fraction(7569, 12610)
+    assert Fraction(*r13["hopfield_photonic_weight"]) == Fraction(5041, 12610)
+    assert Fraction(*r13["thermal_occ_certified_ub"]) < Fraction(1, 500000)
 
 
 # Adversarial forgery tests

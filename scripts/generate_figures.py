@@ -160,33 +160,33 @@ def fig3_dark_mode_filling_and_network() -> None:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.6, 3.55))
 
     etas = [0.001 + 0.349 * i / 200.0 for i in range(201)]
-    # Exact resonant Hopfield lower branch: nu_- / w0 = sqrt(1 + eta^2) - eta
-    # Matter weight w_mat = nu_-^2 / (w0^2 + nu_-^2) = 1 / (1 + (sqrt(1+eta^2)+eta)^2)
+    # Exact resonant Coulomb-gauge Hopfield lower branch: nu_- / w0 = sqrt(1 + eta^2) - eta
+    # Matter weight w_mat^{Coul} = w0^2 / (w0^2 + nu_-^2) > 1/2; photonic weight w_phot^{Coul} = nu_-^2 / (w0^2 + nu_-^2) < 1/2
     w_mat = []
     w_phot = []
     for e in etas:
         r_m = (1.0 + e * e) ** 0.5 - e
-        wm = (r_m * r_m) / (1.0 + r_m * r_m)
-        w_mat.append(wm)
-        w_phot.append(1.0 - wm)
-    ax1.plot(etas, w_mat, color="#d73027", lw=2.2, label=r"Bosonic dark-mode transfer $\Gamma_{\mathrm{MP}^-\!\to\mathcal{D}}/\gamma_{\mathrm{loc}} = w_{\mathrm{mat}}\frac{N-1}{N}$")
-    ax1.plot(etas, w_phot, color="#2166ac", lw=1.8, ls="--", label=r"Photonic weight $w_{\mathrm{phot}} = \frac{\omega_0^2}{\omega_0^2+\nu_-^2}$ ($A^2$ shift)")
+        wp = (r_m * r_m) / (1.0 + r_m * r_m)
+        w_phot.append(wp)
+        w_mat.append(1.0 - wp)
+    ax1.plot(etas, w_mat, color="#d73027", lw=2.2, label=r"Bosonic dark-mode transfer $\Gamma_{\mathrm{MP}^-\!\to\mathcal{D}}/\gamma_{\mathrm{loc}} = w_{\mathrm{mat}}^{\mathrm{Coul}}\frac{N-1}{N}$")
+    ax1.plot(etas, w_phot, color="#2166ac", lw=1.8, ls="--", label=r"Photonic weight $w_{\mathrm{phot}}^{\mathrm{Coul}} = \frac{\nu_-^2}{\omega_0^2+\nu_-^2}$ ($A^2$ cavity shift)")
     ax1.axhline(0.5, color="#555555", lw=1.1, ls=":", label=r"RWA symmetric limit ($w_{\mathrm{mat}} = w_{\mathrm{phot}} = 1/2$)")
     eta_c13 = 1264.0 / 6177.0
     eta_c14 = (7569.0 / 79.0 - 79.0) / (2.0 * 87.0)
     t_c13 = _f(r13["dark_dephasing_transfer_factor"])
     t_c14 = _f(r14["dark_dephasing_transfer_factor"])
     ax1.scatter([eta_c13, eta_c14], [t_c13, t_c14], color="#b2182b", edgecolor="black", s=48, zorder=6)
-    ax1.annotate("C13 (71 THz,\n$w_{\\mathrm{mat}}=0.400$)", xy=(eta_c13, t_c13), xytext=(eta_c13 - 0.02, 0.25),
+    ax1.annotate("C13 (71 THz,\n$w_{\\mathrm{mat}}=0.600$)", xy=(eta_c13, t_c13), xytext=(eta_c13 + 0.025, 0.505),
                  arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7.5)
-    ax1.annotate("C14 (79 THz,\n$w_{\\mathrm{mat}}=0.452$)", xy=(eta_c14, t_c14), xytext=(0.015, 0.30),
+    ax1.annotate("C14 (79 THz,\n$w_{\\mathrm{mat}}=0.548$)", xy=(eta_c14, t_c14), xytext=(0.012, 0.625),
                  arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7.5)
     ax1.set_xlim(0.0, 0.35)
-    ax1.set_ylim(0.20, 0.78)
+    ax1.set_ylim(0.26, 0.78)
     ax1.set_xlabel(r"Normalized coupling $\eta = g / \omega_0$")
-    ax1.set_ylabel("Exact Hopfield weight / transfer factor")
+    ax1.set_ylabel("Exact Coulomb-gauge Hopfield weight")
     ax1.set_title(r"(a) Bosonic Dark-Mode Dephasing Transfer ($N\geq 10^6$)")
-    ax1.legend(loc="upper left", frameon=True, framealpha=0.92, fontsize=6.6)
+    ax1.legend(loc="lower left", frameon=True, framealpha=0.92, fontsize=6.5)
     ax1.grid(alpha=0.22)
 
     # Panel (b): Live Mode 4b passive network reducible floor vs irreducible multi-crista stopband leak

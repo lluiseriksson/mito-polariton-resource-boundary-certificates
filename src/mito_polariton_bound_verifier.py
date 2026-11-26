@@ -411,13 +411,14 @@ def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
     submode = _req_str(payload.get("submode"), "submode")
 
     if submode == "bosonic_hopfield_dark_mode_leakage":
-        # Exact first-principles bosonic Hopfield-Dicke dark-mode dephasing transfer:
+        # Exact first-principles Coulomb-gauge Hopfield-Dicke dark-mode dephasing transfer:
         # N identical bosonic CH_2 stretches coupled to 1 cavity mode at resonance (nu_p * nu_m = w0^2):
         #   - 1 bright symmetric Dicke mode + (N - 1) orthogonal dark modes
-        #   - Lower-polariton Hopfield matter weight w_mat = nu_m^2 / (w0^2 + nu_m^2) < 1/2
-        #   - Photonic weight w_phot = w0^2 / (w0^2 + nu_m^2) > 1/2
+        #   - Exact 4x4 Bogoliubov weights in Coulomb gauge (A^2 blue-shifts cavity mode):
+        #       w_mat^{Coul}  = |u_b|^2 - |v_b|^2 = w0^2 / (w0^2 + nu_m^2) > 1/2
+        #       w_phot^{Coul} = |u_a|^2 - |v_a|^2 = nu_m^2 / (w0^2 + nu_m^2) < 1/2
         #   - Local Markovian dephasing transfer into (N-1) dark modes:
-        #       Gamma_{MP- -> D} / gamma_loc = w_mat * (N - 1) / N  (NO 1/N collective protection!)
+        #       Gamma_{MP- -> D} / gamma_loc = w_mat * (N - 1) / N > 1/4 for all N >= 2!
         #   - Exact Bose-Einstein thermal occupation upper bound n_th = 1 / (exp(h*w0 / kBT) - 1)
         N_dipoles = _req_int(payload.get("num_ch2_dipoles"), "num_ch2_dipoles", 2, 10**12)
         w0 = _parse_rat(payload.get("omega_0_thz"), "omega_0_thz")
@@ -430,10 +431,10 @@ def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
         w0_sq = w0 * w0
         num_sq = nu_m * nu_m
         denom = w0_sq + num_sq
-        w_mat = num_sq * _inv(denom)
-        w_phot = w0_sq * _inv(denom)
-        if w_mat + w_phot != 1 or not (w_mat < Fraction(1, 2) < w_phot):
-            raise VerificationError("Exact Hopfield matter/photonic weight invariant failed")
+        w_mat = w0_sq * _inv(denom)
+        w_phot = num_sq * _inv(denom)
+        if w_mat + w_phot != 1 or not (w_phot < Fraction(1, 2) < w_mat):
+            raise VerificationError("Exact Coulomb-gauge Hopfield matter/photonic weight invariant failed")
 
         bright_frac = Fraction(1, N_dipoles)
         dark_frac = Fraction(N_dipoles - 1, N_dipoles)
@@ -442,8 +443,8 @@ def _verify_mode4(payload: dict[str, Any]) -> dict[str, Any]:
 
         # Exact polariton-to-dark local-dephasing transfer factor w_mat * (N - 1) / N
         dark_transfer_factor = w_mat * dark_frac
-        if dark_transfer_factor < Fraction(1, 2) * w_mat:
-            raise VerificationError("Bosonic dark-mode transfer fell below (1/2)*w_mat for N >= 2")
+        if dark_transfer_factor <= Fraction(1, 4):
+            raise VerificationError("Bosonic dark-mode transfer must strictly exceed 1/4 for N >= 2 in Coulomb gauge")
 
         # Exact SI-2019 dimensionless thermal ratio x = h * w0 / (k_B * T)
         # h / k_B = (662607015 / 10^42) / (1380649 / 10^29) s*K = 662607015 / (1380649 * 10^13) s*K

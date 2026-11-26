@@ -277,12 +277,13 @@ theorem collective_n_dipole_bright_dark_partition (N gamma_loc : Nat) (hN : 2 <=
     rw [← Nat.mul_assoc, Nat.mul_comm gamma_loc 2, Nat.mul_assoc]
   exact ⟨by omega, h2, by omega⟩
 
--- Theorem 16: Exact Resonant Hopfield Matter/Photonic Weights & Bosonic Thermal Vacuum Regime:
--- On resonance (nu_p * nu_m = w0^2), lower-polariton matter weight is w_mat = nu_m^2 / (w0^2 + nu_m^2)
--- and photonic weight is w_phot = w0^2 / (w0^2 + nu_m^2), satisfying:
--- (i) w_mat + w_phot = 1 and w_mat < 1/2 < w_phot whenever 0 < nu_m < w0 (A^2 photonic shift!),
--- (ii) At 71/87 THz: 71^2 = 5041, 87^2 = 7569, sum = 12610, 2*5041 < 12610 < 2*7569,
--- (iii) At T = 310 K (kBT = 26.7 meV, h*87 THz = 359.8 meV): h*w0 / kBT > 13 (vacuum bosonic regime, n_th ~ 1.4e-6).
+-- Theorem 16: Exact Coulomb-Gauge Hopfield A^2 Matter/Photonic Weights & Bosonic Thermal Vacuum Regime:
+-- In the Coulomb-gauge A^2 Hamiltonian (D = g^2 / w0 blue-shifting the cavity mode), exact 4x4 Bogoliubov
+-- diagonalization at resonance (nu_p * nu_m = w0^2) gives lower-polariton weights:
+--   w_mat^{Coul} = w0^2 / (w0^2 + nu_m^2) > 1/2   and   w_phot^{Coul} = nu_m^2 / (w0^2 + nu_m^2) < 1/2
+-- whenever 0 < nu_m < w0 (the A^2 cavity blue-shift makes MP^- more matter-like, strengthening dark-mode leakage!).
+-- At 71/87 THz: 87^2 = 7569, 71^2 = 5041, sum = 12610, 2*5041 < 12610 < 2*7569 (w_mat = 7569/12610 ~ 0.6002).
+-- At T = 310 K (kBT = 26.7 meV, h*87 THz = 359.8 meV): h*w0 / kBT > 13 (vacuum bosonic regime, n_th ~ 1.41e-6).
 theorem bosonic_hopfield_matter_weight_and_vacuum_regime (nu_m w0 : Nat) (hPos : 0 < nu_m) (hLt : nu_m < w0) :
     nu_m * nu_m < w0 * w0 /\
     2 * (nu_m * nu_m) < w0 * w0 + nu_m * nu_m /\
