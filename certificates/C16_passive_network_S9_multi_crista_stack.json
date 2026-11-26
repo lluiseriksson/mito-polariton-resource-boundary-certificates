@@ -1,0 +1,25 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C16",
+  "mode": "dark_mode_filling_and_passive_network",
+  "payload": {
+    "submode": "passive_crista_network_mixing",
+    "network_order_S": 9,
+    "singular_value_const_CS": [
+      25,
+      1
+    ],
+    "calibration_defect_delta": [
+      1,
+      200
+    ],
+    "reducing_line_defect_beta": [
+      1,
+      200
+    ],
+    "irreducible_stopband_leak": [
+      1,
+      1000
+    ]
+  }
+}

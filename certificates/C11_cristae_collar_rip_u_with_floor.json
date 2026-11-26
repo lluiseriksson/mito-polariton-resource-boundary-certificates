@@ -1,0 +1,43 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C11",
+  "mode": "rip_u_collar_and_omega0_floor",
+  "payload": {
+    "submode": "cristae_collar_rip_u_and_spectral_gap",
+    "kappa_0_per_s": [
+      500000,
+      1
+    ],
+    "collar_prefactor_B0_per_s": [
+      1000000000000,
+      1
+    ],
+    "collar_decay_q": [
+      1,
+      10
+    ],
+    "collar_steps": [
+      0,
+      2,
+      4,
+      6,
+      8
+    ],
+    "omega_0_thz": [
+      87,
+      1
+    ],
+    "nu_minus_thz": [
+      71,
+      1
+    ],
+    "bath_peak_thz": [
+      95,
+      1
+    ],
+    "bath_hwhm_thz": [
+      8,
+      1
+    ]
+  }
+}

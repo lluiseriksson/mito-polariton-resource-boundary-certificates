@@ -1,0 +1,32 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C09",
+  "mode": "rip_u_collar_and_omega0_floor",
+  "payload": {
+    "submode": "omega0_davies_dirichlet_floor",
+    "gamma_0_per_s": [
+      1000000,
+      1
+    ],
+    "s_minus": [
+      3,
+      2
+    ],
+    "s_plus": [
+      -1,
+      2
+    ],
+    "o_12": [
+      1,
+      1
+    ],
+    "sigma_minus": [
+      4,
+      5
+    ],
+    "sigma_plus": [
+      1,
+      5
+    ]
+  }
+}

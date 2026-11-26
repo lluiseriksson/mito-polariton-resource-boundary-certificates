@@ -1,0 +1,24 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C01",
+  "mode": "hopfield_a2_polariton_audit",
+  "payload": {
+    "submode": "resonant_hopfield_vs_rwa",
+    "omega_0_thz": [
+      87,
+      1
+    ],
+    "nu_minus_thz": [
+      71,
+      1
+    ],
+    "expected_nu_plus_hop": [
+      7569,
+      71
+    ],
+    "min_eta_usc": [
+      1,
+      5
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C14",
+  "mode": "dark_mode_filling_and_passive_network",
+  "payload": {
+    "submode": "filled_manybody_dark_mode_floor",
+    "num_ch2_dipoles": 100000000,
+    "zero_mode_weights": [
+      [
+        1,
+        10000
+      ],
+      [
+        1,
+        256
+      ],
+      [
+        1,
+        16
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  }
+}

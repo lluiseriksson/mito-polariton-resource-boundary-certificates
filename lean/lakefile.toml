@@ -1,0 +1,6 @@
+name = "MitoPolaritonBoundCert"
+version = "1.0.0"
+defaultTargets = ["MitoPolaritonBoundCert"]
+
+[[lean_lib]]
+name = "MitoPolaritonBoundCert"

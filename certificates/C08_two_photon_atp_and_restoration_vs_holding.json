@@ -1,0 +1,36 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C08",
+  "mode": "bioenergetic_resource_horizon",
+  "payload": {
+    "submode": "photon_vs_atp_and_restoration_gap",
+    "polariton_energy_meV": [
+      1468,
+      5
+    ],
+    "kBT_meV": [
+      2671,
+      100
+    ],
+    "deltaG_atp_meV": [
+      2591,
+      5
+    ],
+    "endpoint_refresh_work_kBT": [
+      10,
+      1
+    ],
+    "refresh_period_s": [
+      1,
+      100
+    ],
+    "holding_floor_kappa0_per_s": [
+      1000000,
+      1
+    ],
+    "holding_coherence_nats": [
+      1,
+      1
+    ]
+  }
+}

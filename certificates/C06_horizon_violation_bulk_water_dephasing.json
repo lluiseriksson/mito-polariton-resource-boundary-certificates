@@ -1,0 +1,33 @@
+{
+  "schema_version": "MITO-POLARITON-BOUND-CERT-1.0",
+  "cert_id": "C06",
+  "mode": "bioenergetic_resource_horizon",
+  "payload": {
+    "submode": "atp_resource_horizon_audit",
+    "temperature_K": [
+      310,
+      1
+    ],
+    "kBT_meV": [
+      2671,
+      100
+    ],
+    "deltaG_atp_meV": [
+      2591,
+      5
+    ],
+    "atp_rate_per_s": [
+      100000,
+      1
+    ],
+    "kappa_down_per_s": [
+      1000000000000,
+      1
+    ],
+    "target_coherence_nats": [
+      1,
+      1
+    ],
+    "expected_feasible": false
+  }
+}
